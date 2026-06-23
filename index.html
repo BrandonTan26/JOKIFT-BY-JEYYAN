@@ -1305,36 +1305,76 @@ document.querySelectorAll('.copy-btn').forEach(b=>{
 });
 
 /* ============ CONFIRM PAYMENT ============ */
-document.getElementById('confirmPay').addEventListener('click',()=>{
-  const nama=document.getElementById('pNama').value.trim();
-  if(!nama){alert('Nama pemesan wajib diisi!');return;}
-  if(cart.length===0){alert('Keranjang kosong!');return;}
-  let total=0;
-  const items=cart.map(it=>{
-    total+=it.total;
-    return `• ${it.jumlah} member (${it.kode}) — Rp${it.total.toLocaleString('id-ID')}`;
-  }).join('\n');
-  const method=document.querySelector('.pay-tab.active').textContent.includes('QRIS')?'QRIS':'Transfer Bank';
-  const first=cart[0];
-  const msg=
-`Halo kak, saya sudah melakukan pembayaran.
+const m_qty = $("#m_qty");
+  const m_kodetoko = $("#m_kodetoko");
+  const m_pin = $("#m_pin");
+  const m_preview = $("#m_preview");
+  const m_addCart = $("#m_addCart");
 
-Nama Pemesan : ${nama}
-Kode Toko    : ${cart.map(c=>c.kode).join(', ')}
-PIN          : ${first.pin}
-Jumlah Member: ${cart.reduce((s,c)=>s+c.jumlah,0)}
-Metode Pembayaran : ${method}
-Total Pembayaran  : Rp${total.toLocaleString('id-ID')}
+  function memberPricePer(qty){
+    return (qty >= MEMBER_BULK_QTY) ? MEMBER_PRICE_BULK : MEMBER_PRICE_LOW;
+  }
 
-Detail:
-${items}
+  function renderMemberPreview(){
+    if(!m_qty || !m_preview) return;
+    const qty = clampInt(m_qty.value || 0, 1);
+    const per = memberPricePer(qty);
+    const total = per * qty;
 
-Terima kasih.`;
-  window.open(`https://wa.me/6287869268855?text=${encodeURIComponent(msg)}`,'_blank');
-  cart=[];saveCart();
-  document.getElementById('pNama').value='';
-  closeModal(document.getElementById('payModal'));
-});
+    const kode = (m_kodetoko?.value || "").trim().toUpperCase();
+    const pin  = (m_pin?.value || "").trim().toUpperCase();
+    const warn = "";
+    m_preview.value =
+`Halo Admin JOKIFT BY JEYYAN 👋
+
+Saya ingin memesan layanan **NEW MEMBER FRESH** dengan detail berikut:
+
+Nama Pemesan:
+
+Aktivasi#${kode || "(KODE_TOKO)"}
+PIN / Tgl Lahir: ${pin || "-"}
+Total Qty Member: ${qty}
+
+Total Pembayaran: ${moneyUpperRpDot(total)}
+
+Bukti pembayaran akan saya kirimkan.
+Terima kasih 🙏${warn}`;
+
+    if(m_addCart){
+      m_addCart.disabled = false;
+      m_addCart.classList.remove("disabledBtn");
+    }
+  }
+
+  [m_qty, m_kodetoko, m_pin].forEach(el=>{
+    if(el) el.addEventListener("input", renderMemberPreview);
+  });
+  renderMemberPreview();
+
+  if(m_addCart){
+    m_addCart.addEventListener("click", ()=>{
+      const qty = clampInt(m_qty?.value || 0, 1);
+      const per = memberPricePer(qty);
+      const total = per * qty;
+
+      const kode = (m_kodetoko?.value || "").trim().toUpperCase();
+      const pin  = (m_pin?.value || "").trim();
+
+      const meta = `Aktivasi#${kode || "-"}<br>PIN / Tgl Lahir: ${pin || "-"}<br>Total Qty Member: ${qty}<br>Harga / Member: ${fmtIDR(per)}`;
+
+      addItem({
+        type:"member",
+        title:"NEW MEMBER FRESH",
+        qty: 1,
+        price: total,
+        meta: meta,
+        sig: `member::${kode||"-"}::${pin||"-"}::${qty}`,
+        payload: { kode, pin, qty, per, total }
+      });
+
+      closeOverlay(memberOverlay);
+    });
+  }
 
 /* ============ SCROLL ANIMATION ============ */
 const io=new IntersectionObserver((entries)=>{
