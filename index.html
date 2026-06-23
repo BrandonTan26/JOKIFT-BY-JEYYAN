@@ -1317,19 +1317,21 @@ document.getElementById('confirmPay').addEventListener('click',()=>{
   const method=document.querySelector('.pay-tab.active').textContent.includes('QRIS')?'QRIS':'Transfer Bank';
   const first=cart[0];
   const msg=
-`Halo kak, saya sudah melakukan pembayaran.
+`Halo Admin JOKIFT BY JEYYAN 👋
 
-Nama Pemesan : ${nama}
-Kode Toko    : ${cart.map(c=>c.kode).join(', ')}
-PIN          : ${first.pin}
-Jumlah Member: ${cart.reduce((s,c)=>s+c.jumlah,0)}
-Metode Pembayaran : ${method}
-Total Pembayaran  : Rp${total.toLocaleString('id-ID')}
+Saya ingin memesan layanan **NEW MEMBER FRESH** dengan detail berikut:
 
-Detail:
-${items}
+Nama Pemesan:
 
-Terima kasih.`;
+Aktivasi#${kode || "(KODE_TOKO)"}
+PIN / Tgl Lahir: ${pin || "-"}
+Total Qty Member: ${qty}
+
+Total Pembayaran: ${moneyUpperRpDot(total)}
+
+Bukti pembayaran akan saya kirimkan.
+Terima kasih 🙏${warn}`;
+
   window.open(`https://wa.me/6287869268855?text=${encodeURIComponent(msg)}`,'_blank');
   cart=[];saveCart();
   document.getElementById('pNama').value='';
