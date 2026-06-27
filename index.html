@@ -490,8 +490,8 @@ footer .heart{color:var(--rose);}
     </div>
     <div class="price-note">
       <strong>💡 Catatan Harga:</strong><br>
-      Rp6.000/member. (SATUAN).<br>
-      (KALAU BELI MINIMAL 15): <strong>Rp5.500/member</strong>.
+      Rp6.500/member. (SATUAN).<br>
+      (KALAU BELI MINIMAL 15): <strong>Rp6.000/member</strong>.
     </div>
     <div class="preview-msg" id="mPreview">Preview pesan akan muncul di sini...</div>
     <div class="modal-actions">
@@ -625,7 +625,7 @@ function updatePreview(){
   const j=parseInt(mJumlah.value)||0;
   const k=mKode.value.trim()||'(KODE_TOKO)';
   const p=mPin.value.trim()||'(PIN/TGL_LAHIR)';
-  const harga=j>=15?5500:6000;
+  const harga=j>=15?6000:6500;
   const total=j*harga;
   mPreview.textContent=
 `📋 PREVIEW PESAN WHATSAPP
@@ -686,7 +686,7 @@ document.getElementById('mAddCart').addEventListener('click',()=>{
   if(j<1){alert('Jumlah member wajib diisi!');return;}
   if(!k){alert('Kode toko wajib diisi!');return;}
   if(!p){alert('PIN / Tanggal lahir wajib diisi!');return;}
-  const harga=j>=15?5500:6000;
+  const harga=j>=15?6000:6500;
   cart.push({jumlah:j,kode:k,pin:p,harga,total:j*harga});
   saveCart();
   closeModal(document.getElementById('memberModal'));
